@@ -3,6 +3,7 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
 #include <QMessageBox>
+#include "customgrapheditor.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -147,4 +148,22 @@ void MainWindow::onIterationComplete(int iteration, double bestLength)
     }
 }
 
+
+
+void MainWindow::on_createCustomGraphButton_clicked()
+{
+    CustomGraphEditor editor(this);
+
+    // Подключаем сигнал к слоту
+    connect(&editor, &CustomGraphEditor::graphCreated, this, [=](const QVector<QPointF>& nodes, const QVector<QVector<double>>& edges) {
+        graph->deleteLater(); // Удалим старый граф
+        graph = new Graph(this);
+
+        // Устанавливаем новые узлы и ребра
+        graph->setCustomGraph(nodes, edges);
+        drawGraph();
+    });
+
+    editor.exec(); // Модально открываем редактор
+}
 

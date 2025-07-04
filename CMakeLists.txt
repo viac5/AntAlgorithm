@@ -15,11 +15,17 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 set(TS_FILES AntAlgorithm_ru_RU.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        ${TS_FILES}
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    customgrapheditor.cpp
+    customgrapheditor.h
+    customgrapheditor.ui  # ← это ОЧЕНЬ важно!
+    graph.cpp graph.h
+    ant.cpp ant.h
+    antcolony.cpp antcolony.h
+    ${TS_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -31,6 +37,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         antcolony.h antcolony.cpp
         ant.h ant.cpp
         graph.h graph.cpp
+
+
+
+        customgrapheditor.h customgrapheditor.cpp customgrapheditor.ui
 
     )
 # Define target properties for Android with Qt 6 as:

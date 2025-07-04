@@ -15,6 +15,7 @@ public:
     QVector<QPointF> getNodes() const;
     QVector<QVector<double>> getEdges() const;
     QVector<int> findShortestPath() const;
+    void setCustomGraph(const QVector<QPointF>& newNodes, const QVector<QVector<double>>& newEdges);
 
 private:
     QVector<QPointF> nodes;

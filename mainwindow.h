@@ -24,6 +24,8 @@ private slots:
     void on_clearButton_clicked();
     void onIterationComplete(int iteration, double bestLength);
 
+    void on_createCustomGraphButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

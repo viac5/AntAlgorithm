@@ -125,3 +125,10 @@ double Graph::calculatePathLength(const QVector<int>& path) const
 
     return length;
 }
+
+
+void Graph::setCustomGraph(const QVector<QPointF>& newNodes, const QVector<QVector<double>>& newEdges)
+{
+    nodes = newNodes;
+    edges = newEdges;
+}
