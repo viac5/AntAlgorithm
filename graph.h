@@ -23,4 +23,4 @@ private:
     double calculatePathLength(const QVector<int>& path) const;
 };
 
-#endif // GRAPH_H
+#endif

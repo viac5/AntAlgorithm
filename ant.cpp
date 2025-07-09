@@ -3,7 +3,6 @@
 #include <cmath>
 #include <random>
 
-// Конструктор
 Ant::Ant(int startNode, int graphSize) :
     currentNode(startNode),
     visitedNodes(graphSize, false)
@@ -16,29 +15,28 @@ void Ant::move(const QVector<QVector<double>>& pheromones,
                const QVector<QVector<double>>& distances,
                double alpha, double beta)
 {
+    const int startNode = path.first();
+
     while (path.size() < visitedNodes.size()) {
         int nextNode = chooseNextNode(pheromones, distances, alpha, beta);
-        if (nextNode == -1)
-            break;
+        if (nextNode == -1) break;
 
         path.push_back(nextNode);
         visitedNodes[nextNode] = true;
         currentNode = nextNode;
     }
 
-    // Возврат к стартовой вершине только если все вершины пройдены
-    if (path.size() == visitedNodes.size()) {
-        path.push_back(path.first());
+    if (path.size() == visitedNodes.size() &&
+        distances[currentNode][startNode] > 0.0) {
+        path.push_back(startNode);
     }
 }
-
 
 QVector<int> Ant::getPath() const
 {
     return path;
 }
 
-// Вычисление длины пути
 double Ant::getPathLength(const QVector<QVector<double>>& distances) const
 {
     double length = 0.0;
@@ -56,7 +54,6 @@ int Ant::chooseNextNode(const QVector<QVector<double>>& pheromones,
     QVector<double> probabilities(n, 0.0);
     double sum = 0.0;
 
-    // 1. Вычисление весов (pheromone^alpha * heuristic^beta)
     for (int i = 0; i < n; ++i) {
         if (!visitedNodes[i] && distances[currentNode][i] > 0.0) {
             double pheromoneInfluence = std::pow(pheromones[currentNode][i], alpha);
@@ -71,7 +68,6 @@ int Ant::chooseNextNode(const QVector<QVector<double>>& pheromones,
         }
     }
 
-    // 2. Если все вероятности нулевые — возврат
     if (sum == 0.0) {
         QVector<int> available;
         for (int i = 0; i < n; ++i) {
@@ -87,11 +83,9 @@ int Ant::chooseNextNode(const QVector<QVector<double>>& pheromones,
         return available[dis(gen)];
     }
 
-    // 3. Нормализация
     for (double& p : probabilities)
         p /= sum;
 
-    // 4. Выбор следующей вершины
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0.0, 1.0);
@@ -105,7 +99,6 @@ int Ant::chooseNextNode(const QVector<QVector<double>>& pheromones,
         }
     }
 
-    // 5. Запасной вариант (если из-за округления не выбрали)
     for (int i = n - 1; i >= 0; --i) {
         if (probabilities[i] > 0.0)
             return i;

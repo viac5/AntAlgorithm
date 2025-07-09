@@ -24,12 +24,10 @@ void CustomGraphEditor::on_addNodeButton_clicked()
     QPointF position = ui->graphicsView->mapToScene(ui->graphicsView->width() / 2, ui->graphicsView->height() / 2);
     int nodeNumber = nodeItems.size();
 
-    // Эллипс
     QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(-15, -15, 30, 30);
     ellipse->setBrush(QBrush(Qt::yellow));
     ellipse->setPen(QPen(Qt::black));
 
-    // Текст
     QGraphicsTextItem* label = new QGraphicsTextItem(QString::number(nodeNumber));
     QFont font;
     font.setPointSize(10);
@@ -37,21 +35,16 @@ void CustomGraphEditor::on_addNodeButton_clicked()
     label->setFont(font);
     label->setDefaultTextColor(Qt::black);
 
-    // Центрируем текст в эллипсе
     QRectF textRect = label->boundingRect();
     label->setPos(-textRect.width() / 2, -textRect.height() / 2);
 
-    // Группа
     QGraphicsItemGroup* group = scene->createItemGroup({ellipse, label});
     group->setPos(position);
     group->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(group);
-
-    // Сохраняем как QGraphicsItem*
     nodeItems.append(group);
     nodePositions.append(position);
 
-    // Обновим матрицу смежности
     int size = nodeItems.size();
     edgeWeights.resize(size);
     for (int i = 0; i < size; ++i)
@@ -60,9 +53,8 @@ void CustomGraphEditor::on_addNodeButton_clicked()
 
 QPointF CustomGraphEditor::getNodeCenter(QGraphicsItem* item)
 {
-    // Предполагаем, что это группа с первым элементом — эллипсом
     auto group = dynamic_cast<QGraphicsItemGroup*>(item);
-    if (!group) return item->scenePos(); // fallback
+    if (!group) return item->scenePos();
 
     for (auto* child : group->childItems()) {
         if (auto* ellipse = dynamic_cast<QGraphicsEllipseItem*>(child)) {
@@ -122,5 +114,5 @@ QVector<QVector<double>> CustomGraphEditor::getEdges() const
 void CustomGraphEditor::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "Mouse clicked at" << event->pos();
-    QDialog::mousePressEvent(event); // не забудь вызывать базовый метод
+    QDialog::mousePressEvent(event);
 }

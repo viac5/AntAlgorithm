@@ -50,4 +50,4 @@ private slots:
     void on_finishButton_clicked();
 };
 
-#endif // CUSTOMGRAPHEDITOR_H
+#endif

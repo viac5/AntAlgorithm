@@ -26,6 +26,8 @@ private slots:
 
     void on_createCustomGraphButton_clicked();
 
+    void on_runBruteForceAlgorithmButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -34,6 +36,7 @@ private:
 
     void drawGraph();
     void drawPath(const QVector<int>& path, QColor color);
+    QString formatPath(const QVector<int>& path) const;
 };
 
-#endif // MAINWINDOW_H
+#endif

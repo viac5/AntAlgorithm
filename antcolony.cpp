@@ -1,16 +1,13 @@
 #include "antcolony.h"
 #include <QDebug>
 
-
 AntColony::AntColony(QObject *parent) : QObject(parent), bestPathLength(1e9) {}
 
 void AntColony::optimize(Graph* graph, int antCount, int iterations,
                          double alpha, double beta, double evaporation, double Q)
 {
-
-    bestPathLength = std::numeric_limits<double>::max(); // Сбрасываем длину
-    bestPath.clear();                                   // Очищаем предыдущий путь
-
+    bestPathLength = std::numeric_limits<double>::max();
+    bestPath.clear();
     auto nodes = graph->getNodes();
     auto distances = graph->getEdges();
     int nodeCount = nodes.size();
@@ -26,8 +23,7 @@ void AntColony::optimize(Graph* graph, int antCount, int iterations,
             ant.move(pheromones, distances, alpha, beta);
             QVector<int> path = ant.getPath();
 
-            // Проверка, что муравей прошел по всем вершинам и вернулся в начало
-            if (isValidTSPPath(path, nodeCount)){
+            if (isValidTSPPath(path, nodeCount, distances)){
                 double length = ant.getPathLength(distances);
                 validPaths.append(path);
 
@@ -38,27 +34,36 @@ void AntColony::optimize(Graph* graph, int antCount, int iterations,
                 }
             }
         }
-
-        // Обновляем феромоны только по корректным путям
         updatePheromones(pheromones, distances, validPaths, evaporation, Q);
     }
 }
 
-bool AntColony::isValidTSPPath(const QVector<int>& path, int nodeCount) {
-    if (path.size() != nodeCount + 1)
-        return false;
+bool AntColony::isValidTSPPath(const QVector<int>& path, int nodeCount,
+                               const QVector<QVector<double>>& distances) {
 
-    if (path.first() != path.last())
-        return false;
+    if (path.size() != nodeCount + 1) return false;
+    if (path.first() != path.last()) return false;
 
-    QSet<int> unique;
+    QVector<bool> visited(nodeCount, false);
+
     for (int i = 0; i < path.size() - 1; ++i) {
-        unique.insert(path[i]);
+        int from = path[i];
+        int to = path[i+1];
+        if (from < 0 || from >= nodeCount || to < 0 || to >= nodeCount)
+            return false;
+        if (distances[from][to] <= 0.0)
+            return false;
+        if (i < path.size() - 1) {
+            if (visited[from]) return false;
+            visited[from] = true;
+        }
+    }
+    for (int i = 0; i < nodeCount; ++i) {
+        if (!visited[i]) return false;
     }
 
-    return unique.size() == nodeCount;
+    return true;
 }
-
 
 void AntColony::updatePheromones(QVector<QVector<double>>& pheromones,
                                  const QVector<QVector<double>>& distances,
@@ -67,14 +72,12 @@ void AntColony::updatePheromones(QVector<QVector<double>>& pheromones,
 {
     int nodeCount = pheromones.size();
 
-    // Испарение феромонов
     for (int i = 0; i < nodeCount; ++i) {
         for (int j = 0; j < nodeCount; ++j) {
             pheromones[i][j] = std::max(pheromones[i][j] * (1.0 - evaporation), 0.01);
         }
     }
 
-    // Добавление новых феромонов
     for (const auto& path : paths) {
         double pathLength = 0.0;
         for (int i = 0; i < path.size() - 1; ++i) {
@@ -92,7 +95,7 @@ void AntColony::updatePheromones(QVector<QVector<double>>& pheromones,
         }
     }
 }
-QVector<int> AntColony::getBestPath() const
-{
+
+QVector<int> AntColony::getBestPath() const {
     return bestPath;
 }

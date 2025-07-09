@@ -25,4 +25,4 @@ private:
                        const QVector<QVector<double>>& distances,
                        double alpha, double beta);
 };
-#endif // ANT_H
+#endif
